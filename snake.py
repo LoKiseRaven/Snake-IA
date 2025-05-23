@@ -1,15 +1,21 @@
 import pygame
+from random import randint
 
 cell_size = 50
 grid_width = 15
 grid_height = 15
 
-color1 = (170, 215, 81)
-color2 = (162, 209, 73)
+grass_color1 = (170, 215, 81)
+grass_color2 = (162, 209, 73)
+
+head_color = (0, 200, 0)
+body_color = (0, 150, 0)
 
 snake = [(7, 7), (6, 7), (5, 7)]
 direction = (1, 0)
 
+apple_exists = False
+apple_position = (0, 0)
 
 pygame.init()
 pygame.display.set_caption("Snake")
@@ -22,13 +28,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # Dessiner le damier
     for y in range(grid_height):
         for x in range(grid_width):
             if (x + y) % 2 == 0:
-                color = color1
+                color = grass_color1
             else:
-                color = color2
+                color = grass_color2
             rect = pygame.Rect(x * cell_size, y * cell_size, cell_size, cell_size)
             pygame.draw.rect(screen, color, rect)
 
@@ -50,9 +55,23 @@ while running:
 
     for (x, y) in snake:
         rect = pygame.Rect(x * cell_size, y * cell_size, cell_size, cell_size)
-        pygame.draw.rect(screen, (0, 100, 0), rect)  # vert foncé
+        pygame.draw.rect(screen, (0, 100, 0), rect)
 
+    if not apple_exists:
+        while True:
+            apple_x = randint(0, grid_width - 1)
+            apple_y = randint(0, grid_height - 1)
+            if (apple_x, apple_y) not in snake:
+                apple_position = (apple_x, apple_y)
+                break
+        apple_exists = True
+    
+    rect = pygame.Rect(apple_position[0] * cell_size, apple_position[1] * cell_size, cell_size, cell_size)
+    pygame.draw.rect(screen, (255, 0, 0), rect)
 
+    if snake[0] == apple_position:
+        snake.append(snake[-1])
+        apple_exists = False
 
     pygame.display.flip()
     clock.tick(7)
